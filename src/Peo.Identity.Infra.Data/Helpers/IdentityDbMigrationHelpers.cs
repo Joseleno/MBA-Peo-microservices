@@ -28,11 +28,21 @@ namespace Peo.Identity.Infra.Data.Helpers
                                              .CreateScope();
             var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.EnvironmentName == "Docker")
             {
                 var context = scope.ServiceProvider.GetRequiredService<IdentityContext>();
 
-                await context.Database.MigrateAsync();
+                try
+                {
+                    await context.Database.MigrateAsync();
+                }
+                catch (Exception ex)
+                {
+                    // Se migration falhar, tenta apenas criar o banco
+                    await context.Database.EnsureCreatedAsync();
+                    Debug.WriteLine($"Migration warning: {ex.Message}");
+                }
+
                 await SeedAspNetIdentity(scope.ServiceProvider);
             }
         }
