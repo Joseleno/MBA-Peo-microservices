@@ -1,0 +1,55 @@
+# Docker Compose Override - Development Settings
+# This file is automatically merged with docker-compose.yml in development
+# It contains development-specific configurations like volume mounts for hot reload
+
+services:
+  identity-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - Logging__LogLevel__Default=Debug
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+    volumes:
+      - ./logs/identity:/app/logs
+
+  gestao-conteudo-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - Logging__LogLevel__Default=Debug
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+    volumes:
+      - ./logs/gestao-conteudo:/app/logs
+
+  gestao-alunos-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - Logging__LogLevel__Default=Debug
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+    volumes:
+      - ./logs/gestao-alunos:/app/logs
+
+  faturamento-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - Logging__LogLevel__Default=Debug
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+    volumes:
+      - ./logs/faturamento:/app/logs
+
+  bff:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - Logging__LogLevel__Default=Debug
+      - Logging__LogLevel__Microsoft.AspNetCore=Information
+    volumes:
+      - ./logs/bff:/app/logs
+
+  sqlserver:
+    environment:
+      - MSSQL_AGENT_ENABLED=true
+      - MSSQL_COLLATION=Latin1_General_CI_AS
+    volumes:
+      - ./scripts/sql:/docker-entrypoint-initdb.d
+
+  rabbitmq:
+    environment:
+      - RABBITMQ_DEFAULT_VHOST=/
