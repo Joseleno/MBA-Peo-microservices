@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Peo.GestaoAlunos.Infra.Data.Contexts;
+using System.Diagnostics;
 
 namespace Peo.GestaoAlunos.Infra.Data.Helpers
 {
@@ -25,11 +26,19 @@ namespace Peo.GestaoAlunos.Infra.Data.Helpers
                                              .CreateScope();
             var env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
 
-            if (env.IsDevelopment())
+            if (env.IsDevelopment() || env.EnvironmentName == "Docker")
             {
                 var context = scope.ServiceProvider.GetRequiredService<GestaoAlunosContext>();
 
-                await context.Database.MigrateAsync();
+                try
+                {
+                    await context.Database.MigrateAsync();
+                }
+                catch (Exception ex)
+                {
+                    await context.Database.EnsureCreatedAsync();
+                    Debug.WriteLine($"Migration warning: {ex.Message}");
+                }
             }
         }
     }
