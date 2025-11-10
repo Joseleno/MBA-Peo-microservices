@@ -162,7 +162,7 @@
     "/v1/conteudo/curso": {
       "post": {
         "tags": [
-          "Conteúdo"
+          "Conte�do"
         ],
         "operationId": "PostV1ConteudoCurso",
         "requestBody": {
@@ -200,7 +200,7 @@
       },
       "get": {
         "tags": [
-          "Conteúdo"
+          "Conte�do"
         ],
         "operationId": "GetV1ConteudoCurso",
         "responses": {
@@ -228,7 +228,7 @@
     "/v1/conteudo/curso/{id}": {
       "get": {
         "tags": [
-          "Conteúdo"
+          "Conte�do"
         ],
         "operationId": "GetV1ConteudoCurso2",
         "parameters": [
@@ -271,7 +271,7 @@
     "/v1/conteudo/curso/{cursoId}/aula": {
       "get": {
         "tags": [
-          "Conteúdo"
+          "Conte�do"
         ],
         "operationId": "GetV1ConteudoCursoAula",
         "parameters": [
@@ -309,7 +309,7 @@
       },
       "post": {
         "tags": [
-          "Conteúdo"
+          "Conte�do"
         ],
         "operationId": "PostV1ConteudoCursoAula",
         "parameters": [
@@ -361,7 +361,7 @@
     "/v1/conteudo/curso/{cursoId}/aula/{aulaId}": {
       "delete": {
         "tags": [
-          "Conteúdo"
+          "Conte�do"
         ],
         "operationId": "DeleteV1ConteudoCursoAula",
         "parameters": [
