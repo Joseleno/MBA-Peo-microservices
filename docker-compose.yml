@@ -1,0 +1,189 @@
+# Docker Compose - PEO Platform (Plataforma de Educação Online)
+# Orquestração local de desenvolvimento com todos os microserviços
+# Execute: docker-compose up -d
+
+services:
+  # ============================================
+  # Infrastructure Services
+  # ============================================
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: peo-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Peo@2025!Strong
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    networks:
+      - peo-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Peo@2025!Strong' -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  rabbitmq:
+    image: rabbitmq:3.13-management-alpine
+    container_name: peo-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=peo
+      - RABBITMQ_DEFAULT_PASS=Peo@2025!
+    ports:
+      - "5672:5672"   # AMQP protocol
+      - "15672:15672" # Management UI
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    networks:
+      - peo-network
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  # ============================================
+  # Microservices - APIs
+  # ============================================
+
+  identity-api:
+    image: peo-identity:latest
+    container_name: peo-identity-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.Identity
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5001:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - peo-network
+
+  gestao-conteudo-api:
+    image: peo-gestao-conteudo:latest
+    container_name: peo-gestao-conteudo-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.GestaoConteudo
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5002:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - peo-network
+
+  gestao-alunos-api:
+    image: peo-gestao-alunos:latest
+    container_name: peo-gestao-alunos-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.GestaoAlunos
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5003:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - peo-network
+
+  faturamento-api:
+    image: peo-faturamento:latest
+    container_name: peo-faturamento-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.Faturamento
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5004:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    networks:
+      - peo-network
+
+  # ============================================
+  # BFF (Backend for Frontend)
+  # ============================================
+
+  bff:
+    image: peo-bff:latest
+    container_name: peo-bff
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.Bff
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:8080
+    ports:
+      - "5000:8080"
+    depends_on:
+      - identity-api
+      - gestao-conteudo-api
+      - gestao-alunos-api
+      - faturamento-api
+    networks:
+      - peo-network
+
+  # ============================================
+  # SPA (Blazor WebAssembly)
+  # ============================================
+
+  spa:
+    image: peo-spa:latest
+    container_name: peo-spa
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.Spa
+    environment:
+      - BFF_URL=http://localhost:5000
+    ports:
+      - "8081:80"
+    depends_on:
+      - bff
+    networks:
+      - peo-network
+
+# ============================================
+# Networks
+# ============================================
+
+networks:
+  peo-network:
+    driver: bridge
+    name: peo-network
+
+# ============================================
+# Volumes (Data Persistence)
+# ============================================
+
+volumes:
+  sqlserver-data:
+    name: peo-sqlserver-data
+  rabbitmq-data:
+    name: peo-rabbitmq-data
