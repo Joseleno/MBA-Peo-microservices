@@ -14,7 +14,7 @@ namespace Peo.Web.Bff.Configuration
             services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
 
             services.AddHttpClient<GestaoConteudoService>(c =>
-                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:GestaoConteudo")!))
+                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:GestaoConteudo") ?? "https://peo-gestao-conteudo-webapi"))
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                 .AddPolicyHandler(PollyExtensions.WaitAndRetry())
                 .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
@@ -26,7 +26,7 @@ namespace Peo.Web.Bff.Configuration
         {
             var endpoints = app
             .MapGroup("v1/conteudo")
-            .WithTags("Conteúdo");
+            .WithTags("Conteï¿½do");
 
             endpoints.MapPost("/curso/", async (CursoRequest request, GestaoConteudoService service, CancellationToken ct) =>
             {
