@@ -14,7 +14,7 @@ namespace Peo.Web.Bff.Configuration
             services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
 
             services.AddHttpClient<FaturamentoService>(c =>
-                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Faturamento")!))
+                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Faturamento") ?? "https://peo-faturamento-webapi"))
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                 .AddPolicyHandler(PollyExtensions.WaitAndRetry())
                 .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
