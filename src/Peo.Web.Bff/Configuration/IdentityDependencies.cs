@@ -14,7 +14,7 @@ namespace Peo.Web.Bff.Configuration
             services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
 
             services.AddHttpClient<IdentityService>(c =>
-                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Identity")!))
+                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Identity") ?? "https://peo-identity-webapi"))
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                 .AddPolicyHandler(PollyExtensions.WaitAndRetry())
                 .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
