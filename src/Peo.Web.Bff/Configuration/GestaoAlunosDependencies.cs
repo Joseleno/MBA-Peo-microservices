@@ -14,7 +14,7 @@ namespace Peo.Web.Bff.Configuration
             services.AddTransient<HttpClientAuthorizationDelegatingHandler>();
 
             services.AddHttpClient<GestaoAlunosService>(c =>
-                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:GestaoAlunos")!))
+                c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:GestaoAlunos") ?? "https://peo-gestao-alunos-webapi"))
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
                 .AddPolicyHandler(PollyExtensions.WaitAndRetry())
                 .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
@@ -65,7 +65,7 @@ namespace Peo.Web.Bff.Configuration
                 return await service.ObterCertificadosAsync(ct);
             });
 
-            // Histórico endpoint
+            // Histï¿½rico endpoint
             endpoints.MapGet("/progresso-matriculas", async (GestaoAlunosService service, CancellationToken ct) =>
             {
                 return await service.ObterHistoricoAsync(ct);
