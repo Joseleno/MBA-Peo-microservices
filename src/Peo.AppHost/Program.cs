@@ -32,9 +32,9 @@ var bff = builder.AddProject<Projects.Peo_Web_Bff>("peo-bff")
         .WaitFor(identitySvc)
         .WithExternalHttpEndpoints();
 
-builder.AddProject<Projects.Peo_Web_Spa>("peo-frontend")       
-       .WithExternalHttpEndpoints()
+builder.AddProject<Projects.Peo_Web_Spa>("peo-frontend")
        .WithReference(bff)
-       .WaitFor(bff);
+       .WaitFor(bff)
+       .WithExternalHttpEndpoints();
 
 builder.Build().Run();
