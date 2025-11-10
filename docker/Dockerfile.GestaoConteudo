@@ -1,0 +1,64 @@
+# Dockerfile for Gestão de Conteúdo API
+# Multi-stage build for optimized image size
+
+# Stage 1: Build
+FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+WORKDIR /src
+
+# Copy solution file
+COPY ["Peo.sln", "./"]
+
+# Copy project files (restore layer - cached when dependencies don't change)
+COPY ["src/Peo.GestaoConteudo.WebApi/Peo.GestaoConteudo.WebApi.csproj", "src/Peo.GestaoConteudo.WebApi/"]
+COPY ["src/Peo.GestaoConteudo.Application/Peo.GestaoConteudo.Application.csproj", "src/Peo.GestaoConteudo.Application/"]
+COPY ["src/Peo.GestaoConteudo.Domain/Peo.GestaoConteudo.Domain.csproj", "src/Peo.GestaoConteudo.Domain/"]
+COPY ["src/Peo.GestaoConteudo.Infra.Data/Peo.GestaoConteudo.Infra.Data.csproj", "src/Peo.GestaoConteudo.Infra.Data/"]
+COPY ["src/Peo.Core/Peo.Core.csproj", "src/Peo.Core/"]
+COPY ["src/Peo.Core.Web/Peo.Core.Web.csproj", "src/Peo.Core.Web/"]
+COPY ["src/Peo.Core.Infra.Data/Peo.Core.Infra.Data.csproj", "src/Peo.Core.Infra.Data/"]
+COPY ["src/Peo.Core.Infra.ServiceBus/Peo.Core.Infra.ServiceBus.csproj", "src/Peo.Core.Infra.ServiceBus/"]
+COPY ["src/Peo.ServiceDefaults/Peo.ServiceDefaults.csproj", "src/Peo.ServiceDefaults/"]
+
+# Restore NuGet packages (cached layer)
+RUN dotnet restore "src/Peo.GestaoConteudo.WebApi/Peo.GestaoConteudo.WebApi.csproj"
+
+# Copy all source code
+COPY ["src/", "src/"]
+
+# Build the application
+WORKDIR "/src/src/Peo.GestaoConteudo.WebApi"
+RUN dotnet build "Peo.GestaoConteudo.WebApi.csproj" -c Release -o /app/build
+
+# Stage 2: Publish
+FROM build AS publish
+RUN dotnet publish "Peo.GestaoConteudo.WebApi.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Stage 3: Runtime
+FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+WORKDIR /app
+
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Copy published application
+COPY --from=publish /app/publish .
+
+# Change ownership to non-root user
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8080
+
+# Environment variables
+ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_ENVIRONMENT=Production
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8080/health || exit 1
+
+# Set entry point
+ENTRYPOINT ["dotnet", "Peo.GestaoConteudo.WebApi.dll"]
