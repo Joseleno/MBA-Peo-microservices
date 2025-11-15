@@ -1,8 +1,7 @@
-﻿using Peo.Web.Bff.Services.Handlers;
-using Peo.Web.Bff.Services.Helpers;
+﻿using Peo.ServiceDefaults;
+using Peo.Web.Bff.Services.Handlers;
 using Peo.Web.Bff.Services.Identity;
 using Peo.Web.Bff.Services.Identity.Dtos;
-using Polly;
 
 namespace Peo.Web.Bff.Configuration
 {
@@ -16,8 +15,7 @@ namespace Peo.Web.Bff.Configuration
             services.AddHttpClient<IdentityService>(c =>
                 c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Identity") ?? "https://peo-identity-webapi"))
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
-                .AddPolicyHandler(PollyExtensions.WaitAndRetry())
-                .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+                .AddCustomResilienceHandler(); // Retry + Circuit Breaker + Timeout
 
             return services;
         }
