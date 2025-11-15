@@ -1,82 +1,70 @@
-# Directories
+# Build outputs
 **/bin/
 **/obj/
 **/out/
 **/TestResults/
-**/.vs/
-**/.vscode/
-**/.idea/
-**/node_modules/
-**/charts/
-
-# Files
-**/*.*proj.user
-**/*.suo
-**/*.cache
-**/.DS_Store
-**/Thumbs.db
-**/*.dbmdl
-**/*.jfm
-**/npm-debug.log
-
-# Git
-**/.git
-**/.gitignore
-**/.gitattributes
-!.git/HEAD
-!.git/config
-!.git/packed-refs
-!.git/refs/heads/**
-
-# Documentation
-**/README.md
-**/docs/
-**/*.md
-!**/README.md
-
-# Docker
-**/.dockerignore
-**/docker-compose*
-**/Dockerfile*
-**/.docker/
-
-# CI/CD
-**/.github/
-**/.gitlab-ci.yml
-**/.travis.yml
-**/azds.yaml
-
-# Build artifacts
-**/packages/
-
-# Logs
-**/logs/
-**/*.log
-
-# Database files
-**/*.db
-**/*.db-shm
-**/*.db-wal
-
-# Environment files
-**/.env
-**/.env.*
-**/secrets.dev.yaml
-**/values.dev.yaml
-
-# Kubernetes
-**/k8s/
-
-# Scripts
-**/scripts/
-
-# Tests
-**/tests/
-**/*Tests/
-**/*.Tests/
 
 # IDE
-**/.classpath
-**/.project
-**/.settings
-**/.toolstarget
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+
+# Test Coverage
+coverage/
+*.coverage
+*.coveragexml
+
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Docker
+**/Dockerfile*
+**/docker-compose*
+**/.dockerignore
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+docs/
+README*
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+azure-pipelines.yml
+
+# Node modules
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# OS
+.DS_Store
+Thumbs.db
