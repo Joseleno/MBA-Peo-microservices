@@ -181,4 +181,56 @@ public static class Extensions
 
         return app;
     }
+
+    /// <summary>
+    /// Adiciona políticas de resiliência customizadas ao HttpClient.
+    /// Inclui: Retry com exponential backoff, Circuit Breaker e Timeout.
+    /// </summary>
+    public static IHttpClientBuilder AddCustomResilienceHandler(this IHttpClientBuilder builder)
+    {
+        builder.AddStandardResilienceHandler(options =>
+        {
+            // Retry Policy: 3 tentativas com exponential backoff
+            options.Retry.MaxRetryAttempts = 3;
+            options.Retry.BackoffType = Polly.DelayBackoffType.Exponential;
+            options.Retry.UseJitter = true; // Adiciona jitter para evitar "thundering herd"
+
+            // Circuit Breaker: Abre após 50% de falhas em 30 segundos
+            options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+            options.CircuitBreaker.FailureRatio = 0.5; // 50% de falhas
+            options.CircuitBreaker.MinimumThroughput = 10; // Mínimo de 10 requisições
+            options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(30); // Aguarda 30s antes de tentar novamente
+
+            // Timeout: 30 segundos por requisição
+            options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(30);
+        });
+
+        return builder;
+    }
+
+    /// <summary>
+    /// Adiciona políticas de resiliência agressivas para serviços críticos.
+    /// Retry mais rápido e Circuit Breaker mais sensível.
+    /// </summary>
+    public static IHttpClientBuilder AddAggressiveResilienceHandler(this IHttpClientBuilder builder)
+    {
+        builder.AddStandardResilienceHandler(options =>
+        {
+            // Retry: 5 tentativas com backoff rápido
+            options.Retry.MaxRetryAttempts = 5;
+            options.Retry.BackoffType = Polly.DelayBackoffType.Exponential;
+            options.Retry.UseJitter = true;
+
+            // Circuit Breaker: Mais sensível - abre com 30% de falhas
+            options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(15);
+            options.CircuitBreaker.FailureRatio = 0.3; // 30% de falhas
+            options.CircuitBreaker.MinimumThroughput = 5;
+            options.CircuitBreaker.BreakDuration = TimeSpan.FromSeconds(15);
+
+            // Timeout: 10 segundos (mais agressivo)
+            options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(10);
+        });
+
+        return builder;
+    }
 }
