@@ -6,6 +6,7 @@ using Peo.Core.Web.Services;
 using Peo.GestaoConteudo.Application.Consumers;
 using Peo.GestaoConteudo.Application.DependencyInjectionConfiguration;
 using Peo.GestaoConteudo.Infra.Data.DependencyInjectionConfiguration;
+using Peo.ServiceDefaults;
 
 namespace Peo.GestaoConteudo.WebApi.Configuration
 {
@@ -18,7 +19,17 @@ namespace Peo.GestaoConteudo.WebApi.Configuration
                     .AddAppSettings(configuration)
                     .AddMediator()
                     .AddServiceBus(configuration, [typeof(ObterDetalhesCursoConsumer).Assembly])
-                    .AddApiServices();
+                    .AddApiServices()
+                    .AddApiHealthChecks(configuration, hostEnvironment);
+
+            return services;
+        }
+
+        private static IServiceCollection AddApiHealthChecks(this IServiceCollection services, IConfiguration configuration, IHostEnvironment hostEnvironment)
+        {
+            services.AddHealthChecks()
+                    .AddDatabaseHealthChecks(configuration, hostEnvironment)
+                    .AddRabbitMQHealthCheck(configuration);
 
             return services;
         }
