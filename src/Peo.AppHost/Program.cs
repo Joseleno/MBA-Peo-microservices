@@ -37,4 +37,4 @@ builder.AddProject<Projects.Peo_Web_Spa>("peo-frontend")
        .WaitFor(bff)
        .WithExternalHttpEndpoints();
 
-builder.Build().Run();
+await builder.Build().RunAsync();
