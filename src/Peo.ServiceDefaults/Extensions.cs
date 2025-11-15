@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Hosting;
@@ -98,21 +99,85 @@ public static class Extensions
         return builder;
     }
 
+    public static IHealthChecksBuilder AddDatabaseHealthChecks(this IHealthChecksBuilder healthChecks, IConfiguration configuration, IHostEnvironment environment)
+    {
+        if (environment.IsDevelopment())
+        {
+            var sqliteConnection = configuration.GetConnectionString("SQLiteConnection");
+            if (!string.IsNullOrEmpty(sqliteConnection))
+            {
+                healthChecks.AddSqlite(sqliteConnection, name: "database", tags: ["ready", "db"]);
+            }
+        }
+        else
+        {
+            var sqlServerConnection = configuration.GetConnectionString("SqlServerConnection");
+            if (!string.IsNullOrEmpty(sqlServerConnection))
+            {
+                healthChecks.AddSqlServer(sqlServerConnection, name: "database", tags: ["ready", "db"]);
+            }
+        }
+
+        return healthChecks;
+    }
+
+    public static IHealthChecksBuilder AddRabbitMQHealthCheck(this IHealthChecksBuilder healthChecks, IConfiguration configuration)
+    {
+        // Try to get RabbitMQ connection string from messaging connection string (AMQP URI format)
+        var messagingConnectionString = configuration.GetConnectionString("messaging");
+
+        if (!string.IsNullOrEmpty(messagingConnectionString))
+        {
+            healthChecks.AddRabbitMQ(
+                sp =>
+                {
+                    var factory = new RabbitMQ.Client.ConnectionFactory();
+                    factory.Uri = new Uri(messagingConnectionString);
+                    return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                },
+                name: "rabbitmq",
+                tags: ["ready", "messaging"]);
+        }
+        else
+        {
+            // Fallback: Try to build connection string from RabbitMQ section
+            var rabbitMQSection = configuration.GetSection("RabbitMQ");
+            var host = rabbitMQSection["Host"];
+            var username = rabbitMQSection["Username"];
+            var password = rabbitMQSection["Password"];
+            var port = rabbitMQSection["Port"] ?? "5672";
+
+            if (!string.IsNullOrEmpty(host) && !string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
+            {
+                var connectionString = $"amqp://{username}:{Uri.EscapeDataString(password)}@{host}:{port}";
+                healthChecks.AddRabbitMQ(
+                    sp =>
+                    {
+                        var factory = new RabbitMQ.Client.ConnectionFactory();
+                        factory.Uri = new Uri(connectionString);
+                        return factory.CreateConnectionAsync().GetAwaiter().GetResult();
+                    },
+                    name: "rabbitmq",
+                    tags: ["ready", "messaging"]);
+            }
+        }
+
+        return healthChecks;
+    }
+
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
-        // Adding health checks endpoints to applications in non-development environments has security implications.
-        // See https://aka.ms/dotnet/aspire/healthchecks for details before enabling these endpoints in non-development environments.
-        if (app.Environment.IsDevelopment())
+        // All health checks must pass for app to be considered ready to accept traffic after starting
+        app.MapHealthChecks("/health", new HealthCheckOptions
         {
-            // All health checks must pass for app to be considered ready to accept traffic after starting
-            app.MapHealthChecks("/health");
+            Predicate = r => r.Tags.Contains("ready")
+        });
 
-            // Only health checks tagged with the "live" tag must pass for app to be considered alive
-            app.MapHealthChecks("/alive", new HealthCheckOptions
-            {
-                Predicate = r => r.Tags.Contains("live")
-            });
-        }
+        // Only health checks tagged with the "live" tag must pass for app to be considered alive
+        app.MapHealthChecks("/alive", new HealthCheckOptions
+        {
+            Predicate = r => r.Tags.Contains("live")
+        });
 
         return app;
     }
