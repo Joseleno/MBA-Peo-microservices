@@ -13,6 +13,7 @@ using Peo.Identity.Infra.Data.Contexts;
 using Peo.Identity.Infra.Data.DependencyInjectionConfiguration;
 using Peo.Identity.Infra.Data.Repositories;
 using Peo.Identity.WebApi.Extensions;
+using Peo.ServiceDefaults;
 
 namespace Peo.Identity.WebApi.Configuration
 {
@@ -26,7 +27,17 @@ namespace Peo.Identity.WebApi.Configuration
                     .AddAppSettings(configuration)
                     .AddMediator()
                     .AddServiceBus(configuration, [typeof(ObterDetalhesUsuarioConsumer).Assembly])
-                    .AddApiServices();
+                    .AddApiServices()
+                    .AddApiHealthChecks(configuration, hostEnvironment);
+
+            return services;
+        }
+
+        private static IServiceCollection AddApiHealthChecks(this IServiceCollection services, IConfiguration configuration, IHostEnvironment hostEnvironment)
+        {
+            services.AddHealthChecks()
+                    .AddDatabaseHealthChecks(configuration, hostEnvironment)
+                    .AddRabbitMQHealthCheck(configuration);
 
             return services;
         }
