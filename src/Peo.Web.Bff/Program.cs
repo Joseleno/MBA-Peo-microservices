@@ -20,7 +20,7 @@ builder.Services.AddIdentity(builder.Configuration)
 builder.Services.AddOpenApiDocument(o =>
 {
     o.DocumentName = "v1"; // nome que vamos pedir ao gerador
-    o.Title = "Plataforma de Educação Online - WebAPI";
+    o.Title = "Plataforma de Educaï¿½ï¿½o Online - WebAPI";
 });
 
 var app = builder.Build();
@@ -44,5 +44,6 @@ app.AddFaturamentoEndpoints();
 app.AddGestaoConteudoEndpoints();
 app.AddGestaoAlunosEndpoints();
 app.AddHistoricoEndpoints();
+app.MapDefaultEndpoints();
 
 await app.RunAsync();
