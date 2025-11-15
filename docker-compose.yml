@@ -69,6 +69,12 @@ services:
         condition: service_healthy
     networks:
       - peo-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/alive || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   gestao-conteudo-api:
     image: peo-gestao-conteudo:latest
@@ -88,6 +94,12 @@ services:
         condition: service_healthy
     networks:
       - peo-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/alive || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   gestao-alunos-api:
     image: peo-gestao-alunos:latest
@@ -107,6 +119,12 @@ services:
         condition: service_healthy
     networks:
       - peo-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/alive || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   faturamento-api:
     image: peo-faturamento:latest
@@ -126,6 +144,12 @@ services:
         condition: service_healthy
     networks:
       - peo-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/alive || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # ============================================
   # BFF (Backend for Frontend)
@@ -143,12 +167,22 @@ services:
     ports:
       - "5000:8080"
     depends_on:
-      - identity-api
-      - gestao-conteudo-api
-      - gestao-alunos-api
-      - faturamento-api
+      identity-api:
+        condition: service_healthy
+      gestao-conteudo-api:
+        condition: service_healthy
+      gestao-alunos-api:
+        condition: service_healthy
+      faturamento-api:
+        condition: service_healthy
     networks:
       - peo-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/alive || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   # ============================================
   # SPA (Blazor WebAssembly)
@@ -165,7 +199,8 @@ services:
     ports:
       - "8081:80"
     depends_on:
-      - bff
+      bff:
+        condition: service_healthy
     networks:
       - peo-network
 
