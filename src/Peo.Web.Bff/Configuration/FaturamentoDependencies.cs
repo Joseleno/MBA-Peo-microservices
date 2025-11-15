@@ -1,8 +1,7 @@
-﻿using Peo.Web.Bff.Services.Faturamento;
+﻿using Peo.ServiceDefaults;
+using Peo.Web.Bff.Services.Faturamento;
 using Peo.Web.Bff.Services.Faturamento.Dtos;
 using Peo.Web.Bff.Services.Handlers;
-using Peo.Web.Bff.Services.Helpers;
-using Polly;
 
 namespace Peo.Web.Bff.Configuration
 {
@@ -16,8 +15,7 @@ namespace Peo.Web.Bff.Configuration
             services.AddHttpClient<FaturamentoService>(c =>
                 c.BaseAddress = new Uri(configuration.GetValue<string>("Endpoints:Faturamento") ?? "https://peo-faturamento-webapi"))
                 .AddHttpMessageHandler<HttpClientAuthorizationDelegatingHandler>()
-                .AddPolicyHandler(PollyExtensions.WaitAndRetry())
-                .AddTransientHttpErrorPolicy(p => p.CircuitBreakerAsync(5, TimeSpan.FromSeconds(30)));
+                .AddCustomResilienceHandler(); // Retry + Circuit Breaker + Timeout
 
             return services;
         }
