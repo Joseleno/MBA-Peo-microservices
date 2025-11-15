@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: sqlserver
+  namespace: peo-platform
+spec:
+  serviceName: "sqlserver-service"
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sqlserver
+  template:
+    metadata:
+      labels:
+        app: sqlserver
+    spec:
+      containers:
+      - name: sqlserver
+        image: mcr.microsoft.com/mssql/server:2022-latest
+        ports:
+        - containerPort: 1433
+          name: sqlserver
+        env:
+        - name: ACCEPT_EULA
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: ACCEPT_EULA
+        - name: SA_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: peo-secrets
+              key: SA_PASSWORD
+        - name: MSSQL_PID
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: MSSQL_PID
+        volumeMounts:
+        - name: sqlserver-data
+          mountPath: /var/opt/mssql
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "1000m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        livenessProbe:
+          exec:
+            command:
+            - /opt/mssql-tools18/bin/sqlcmd
+            - -S
+            - localhost
+            - -U
+            - sa
+            - -P
+            - $(SA_PASSWORD)
+            - -C
+            - -Q
+            - SELECT 1
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 10
+        readinessProbe:
+          exec:
+            command:
+            - /opt/mssql-tools18/bin/sqlcmd
+            - -S
+            - localhost
+            - -U
+            - sa
+            - -P
+            - $(SA_PASSWORD)
+            - -C
+            - -Q
+            - SELECT 1
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 3
+          failureThreshold: 3
+  volumeClaimTemplates:
+  - metadata:
+      name: sqlserver-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi
