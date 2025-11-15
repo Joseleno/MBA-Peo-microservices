@@ -8,6 +8,7 @@ using Peo.Faturamento.Domain.Services;
 using Peo.Faturamento.Infra.Data.DependencyInjectionConfiguration;
 using Peo.Faturamento.Integrations.Paypal.Services;
 using Peo.Faturamento.WebApi.Endpoints;
+using Peo.ServiceDefaults;
 
 namespace Peo.Faturamento.WebApi.Configuration
 {
@@ -21,7 +22,17 @@ namespace Peo.Faturamento.WebApi.Configuration
                     .AddMediator()
                     .AddServiceBus(configuration)
                     .AddApiServices()
-                    .AddExternalServices();
+                    .AddExternalServices()
+                    .AddApiHealthChecks(configuration, hostEnvironment);
+
+            return services;
+        }
+
+        private static IServiceCollection AddApiHealthChecks(this IServiceCollection services, IConfiguration configuration, IHostEnvironment hostEnvironment)
+        {
+            services.AddHealthChecks()
+                    .AddDatabaseHealthChecks(configuration, hostEnvironment)
+                    .AddRabbitMQHealthCheck(configuration);
 
             return services;
         }
