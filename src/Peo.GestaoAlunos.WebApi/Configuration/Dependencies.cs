@@ -7,6 +7,7 @@ using Peo.GestaoAlunos.Application.Consumers;
 using Peo.GestaoAlunos.Application.DependencyInjectionConfiguration;
 using Peo.GestaoAlunos.Infra.Data.DependencyInjectionConfiguration;
 using Peo.GestaoAlunos.WebApi.Endpoints;
+using Peo.ServiceDefaults;
 
 namespace Peo.GestaoAlunos.WebApi.Configuration
 {
@@ -19,7 +20,17 @@ namespace Peo.GestaoAlunos.WebApi.Configuration
                     .AddAppSettings(configuration)
                     .AddMediator()
                     .AddServiceBus(configuration, [typeof(PagamentoMatriculaEventConsumer).Assembly])
-                    .AddApiServices();
+                    .AddApiServices()
+                    .AddApiHealthChecks(configuration, hostEnvironment);
+
+            return services;
+        }
+
+        private static IServiceCollection AddApiHealthChecks(this IServiceCollection services, IConfiguration configuration, IHostEnvironment hostEnvironment)
+        {
+            services.AddHealthChecks()
+                    .AddDatabaseHealthChecks(configuration, hostEnvironment)
+                    .AddRabbitMQHealthCheck(configuration);
 
             return services;
         }
