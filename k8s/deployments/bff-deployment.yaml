@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bff
+  namespace: peo-platform
+  labels:
+    app: bff
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: bff
+  template:
+    metadata:
+      labels:
+        app: bff
+    spec:
+      containers:
+      - name: bff
+        image: SEU_DOCKER_USERNAME/peo-bff:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: ASPNETCORE_ENVIRONMENT
+        - name: ASPNETCORE_URLS
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: ASPNETCORE_URLS
+        - name: IDENTITY_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: IDENTITY_API_URL
+        - name: GESTAO_CONTEUDO_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: GESTAO_CONTEUDO_API_URL
+        - name: GESTAO_ALUNOS_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: GESTAO_ALUNOS_API_URL
+        - name: FATURAMENTO_API_URL
+          valueFrom:
+            configMapKeyRef:
+              name: peo-config
+              key: FATURAMENTO_API_URL
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /alive
+            port: 8080
+          initialDelaySeconds: 40
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
