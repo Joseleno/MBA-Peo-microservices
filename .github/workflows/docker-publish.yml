@@ -81,6 +81,7 @@ jobs:
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build and push Docker image
+        id: build
         uses: docker/build-push-action@v5
         with:
           context: ${{ matrix.context }}
@@ -95,4 +96,4 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
 
       - name: Image digest
-        run: echo "Image digest for ${{ matrix.service }}: ${{ steps.build.outputs.digest }}"
+        run: echo "Image built successfully for service ${{ matrix.service }}"
