@@ -1,5 +1,5 @@
-[![.NET](https://github.com/jonataspc/MBA-Peo-microservices/actions/workflows/dotnet.yml/badge.svg)](https://github.com/jonataspc/MBA-Peo-microservices/actions/workflows/dotnet.yml)
-[![Docker Publish](https://github.com/jonataspc/MBA-Peo-microservices/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/jonataspc/MBA-Peo-microservices/actions/workflows/docker-publish.yml)
+[![.NET](https://github.com/Joseleno/MBA-Peo-microservices/actions/workflows/dotnet.yml/badge.svg)](https://github.com/Joseleno/MBA-Peo-microservices/actions/workflows/dotnet.yml)
+[![Docker Publish](https://github.com/Joseleno/MBA-Peo-microservices/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/Joseleno/MBA-Peo-microservices/actions/workflows/docker-publish.yml)
 
 # PEO - Plataforma de Educação Online
 
@@ -11,13 +11,7 @@ O objetivo principal é evoluir a Plataforma Educacional Distribuída desenvolvi
 
 ### Autores
 
-- **Eduardo Gimenes**
-- **Filipe Alan Elias**
-- **Jonatas Cruz**
 - **Joseleno Santos**
-- **Leandro Andreotti**
-- **Paulo Cesar Carneiro**
-- **Marcelo Menezes**
 
 ---
 
@@ -125,7 +119,7 @@ Forma mais rápida de rodar todo o ecossistema localmente.
 
 ```bash
 # 1. Clone
-git clone https://github.com/jonataspc/MBA-Peo-microservices.git
+git clone https://github.com/Joseleno/MBA-Peo-microservices.git
 cd MBA-Peo-microservices
 
 # 2. Inicie
@@ -203,7 +197,7 @@ kubectl delete namespace peo-platform
 
 ```bash
 # Clone
-git clone https://github.com/jonataspc/MBA-Peo-microservices.git
+git clone https://github.com/Joseleno/MBA-Peo-microservices.git
 cd MBA-Peo-microservices
 
 # Aspire AppHost
@@ -398,6 +392,6 @@ kubectl get pods -n ingress-nginx
 
 ## Contato
 
-**Repositório**: https://github.com/jonataspc/MBA-Peo-microservices
+**Repositório**: https://github.com/Joseleno/MBA-Peo-microservices
 
 **Projeto Acadêmico** - MBA DevXpert Full Stack .NET - Desenvolvedor.IO
