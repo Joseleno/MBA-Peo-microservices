@@ -364,8 +364,6 @@ kubectl get pods -n ingress-nginx
 
 - **[Kubernetes README](./k8s/README.md)**: Guia completo Kubernetes
 - **[Docker Compose Guide](./docker/DOCKER_COMPOSE_GUIDE.md)**: Detalhes Docker Compose
-- **[PLANO_IMPLEMENTACAO_DEVOPS.md](./PLANO_IMPLEMENTACAO_DEVOPS.md)**: Plano de implementação
-- **[Documentação Arquitetura](./docs/README.md)**: Decisões técnicas
 
 ---
 
