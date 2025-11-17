@@ -367,27 +367,6 @@ kubectl get pods -n ingress-nginx
 
 ---
 
-## Matriz de Avaliação (PDF)
-
-| Critério | Peso | Status |
-|----------|------|--------|
-| Funcionalidades DevOps | 30% | ✅ Completo (Pipeline CI/CD, Docker Hub) |
-| Qualidade do Código | 30% | ✅ Completo (Dockerfiles, YAMLs, versionado) |
-| Integração Kubernetes | 10% | ✅ Completo (25 manifestos, cluster funcional) |
-| Observabilidade | 10% | ✅ Completo (Health checks, logs, métricas) |
-| Documentação | 10% | ✅ Completo (README, Swagger, k8s/README.md) |
-| Resolução de Feedbacks | 10% | ✅ Implementado (FEEDBACK.md) |
-
----
-
-## Avaliação
-
-- Este projeto é parte de um curso acadêmico e não aceita contribuições externas.
-- Para feedbacks ou dúvidas utilize o recurso de **Issues** do GitHub.
-- O arquivo **FEEDBACK.md** é um resumo das avaliações do instrutor e deverá ser modificado apenas por ele.
-
----
-
 ## Contato
 
 **Repositório**: https://github.com/Joseleno/MBA-Peo-microservices
