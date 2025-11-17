@@ -1,7 +1,7 @@
-# Notas de apoio para desenvolvedores
+# Notas de apoio
 
 
-## EF Core: Geração das migrations 
+## EF Core: GeraÃ§Ã£o das migrations 
 ```
 Add-Migration [NAME] -verbose -Context [NAMEOFDBCONTEXT] -Project Peo.Identity.Infra.Data -Startup Peo.Web.Api
 ```
